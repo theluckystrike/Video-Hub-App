@@ -1,7 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
 import type { ImageElement, StarRating } from '../../../interfaces/final-object.interface';
-import { randomizeArray } from '../../../node/utility';
 import { orderBy } from 'natural-orderby';
 
 export type SortType = 'default'
@@ -81,6 +80,11 @@ const sortMapping: Partial<Record<SortType, [SortOrderType, boolean]>> = {
   name: 'sortingPipe'
 })
 export class SortingPipe implements PipeTransform {
+
+  // random position of each video, kept until the shuffle button is pressed again
+  // so that other pipes re-running (e.g. after a heart click) do not reshuffle the gallery
+  private randomRank: Map<string, number> = new Map();
+  private lastShuffleTrigger: number | string;
 
   /**
    * Helper function for sorting
@@ -165,8 +169,19 @@ export class SortingPipe implements PipeTransform {
       return galleryArray;
 
     } else if (sortingType === 'random') {
-      const currentIndex = (galleryArray[0]?.fileName === '*UP*' ? 1 : 0); // skip 'up button' if present
-      return randomizeArray(galleryArray, currentIndex);
+      if (forceSortUpdateTrigger !== this.lastShuffleTrigger) {
+        this.lastShuffleTrigger = forceSortUpdateTrigger;
+        this.randomRank.clear();
+      }
+      const getRank = (element: ImageElement): number => {
+        if (!this.randomRank.has(element.uuid)) {
+          this.randomRank.set(element.uuid, Math.random());
+        }
+        return this.randomRank.get(element.uuid);
+      };
+      const tempGallery: ImageElement[] = galleryArray.slice();
+      const tempUp: ImageElement[] = (tempGallery[0]?.fileName === '*UP*') ? [tempGallery.shift()] : []; // keep 'up button' first
+      return [...tempUp, ...tempGallery.sort((x: ImageElement, y: ImageElement): number => getRank(x) - getRank(y))];
 
     } else if (sortingType === 'default') {
       return galleryArray; // sorting order set via `alphabetizeFinalArray` in `main-support.ts`
