@@ -49,8 +49,8 @@ const sortMapping: Partial<Record<SortType, [SortOrderType, boolean]>> = {
   aspectRatioDesc: ['aspectRatio',  false],
   createdAsc:      ['birthtime',    true],
   createdDesc:     ['birthtime',    false],
-  dateAddedAsc:    ['index',        true],
-  dateAddedDesc:   ['index',        false],
+  dateAddedAsc:    ['additionOrder', true],
+  dateAddedDesc:   ['additionOrder', false],
   folderSizeAsc:   ['folderSize',   true],
   folderSizeDesc:  ['folderSize',   false],
   fpsAsc:          ['fps',          true],
@@ -111,6 +111,9 @@ export class SortingPipe implements PipeTransform {
     };
 
     switch (property) {
+      case 'additionOrder':
+        return compareValues(x.additionOrder ?? x.index, y.additionOrder ?? y.index);
+
       case 'alphabetical':
         return compareValues(x.fileName.toLowerCase(), y.fileName.toLowerCase());
 

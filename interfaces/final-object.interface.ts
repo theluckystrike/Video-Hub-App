@@ -48,6 +48,7 @@ export interface ImageElement {
   // ========================================================================
   // OPTIONAL
   // ------------------------------------------------------------------------
+  additionOrder?: number;       // insertion ordinal; absent in older hubs (not a timestamp)
   defaultScreen?: number;        // index of default screenshot to show
   notes?: string;                // any free-form notes a user may want to add to any video
   playlist?: number;             // timestamp of when user clicked `add to playlist`

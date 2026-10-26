@@ -565,8 +565,13 @@ export function sendFinalObjectToAngular(finalObject: FinalObject, globals: VhaG
  */
 export function insertTemporaryFields(imagesArray: ImageElement[]): ImageElement[] {
 
+  // Older hubs have no insertion history; use their existing order as a baseline.
+  let nextAdditionOrder = imagesArray.reduce((next, element) =>
+    Math.max(next, (element.additionOrder ?? -1) + 1), 0);
+
   imagesArray.forEach((element, index) => {
     element = insertTemporaryFieldsSingle(element);
+    if (element.additionOrder === undefined) element.additionOrder = nextAdditionOrder++;
     element.index = index;                              // TODO -- rethink index -- maybe fix here ?
   });
 

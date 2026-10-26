@@ -883,6 +883,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
         });
 
       if (!this.demo || this.imageElementService.imageElements.length <= 50) {
+        // Keep addition order separate from the positional index used for edits.
+        element.additionOrder = this.imageElementService.imageElements.reduce((next, current) =>
+          Math.max(next, (current.additionOrder ?? current.index) + 1), 0);
         element.index = this.imageElementService.imageElements.length;
         this.imageElementService.imageElements.push(element); // not enough for view to update; we need `.slice()`
         this.imageElementService.finalArrayNeedsSaving = true;
